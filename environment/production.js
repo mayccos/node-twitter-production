@@ -1,5 +1,5 @@
 module.exports = {
-    dbUrl: 'mongodb+srv://alex:qwe@cluster0-l4izx.gcp.mongodb.net/twitter?retryWrites=true',
+    dbUrl: 'mongodb+srv://mayccos:Pompounet-89@cluster-projet-14.nxgcf.mongodb.net/twitter',
     cert: '',
     key: '',
 }
