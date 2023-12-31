@@ -1,5 +1,5 @@
 module.exports = {
-    dbUrl: 'mongodb+srv://alex:qwe@cluster0-l4izx.gcp.mongodb.net/twitter?retryWrites=true',
-    cert: '',
-    key: '',
+    dbUrl: 'mongodb+srv://mayccos:Pompounet-89@cluster-projet-14.nxgcf.mongodb.net/twitter',
+    cert: '/etc/letsencrypt/live/www.mayccos.fr/fullchain.pem',
+    key: '/etc/letsencrypt/live/www.mayccos.fr/privkey.pem',
 }
