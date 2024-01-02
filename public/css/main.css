@@ -5,6 +5,8 @@
 
 body {
     background-color: #f8f9fa;
+}
+.pointer-cursor {
     cursor: pointer;
 }
 .navbar {

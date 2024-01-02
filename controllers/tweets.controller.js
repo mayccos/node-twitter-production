@@ -4,15 +4,18 @@ const {
     deleteTweet,
     getTweet,
     updateTweet,
+    getCurrentUserTweetsWithFollowing,
 } = require('../queries/tweets.queries')
 
 exports.tweetsList = async (req, res, next) => {
     try {
-        const tweets = await getTweets()
+        const tweets = await getCurrentUserTweetsWithFollowing(req.user)
         res.render('tweets/tweet', {
             tweets,
             isAuthenticated: req.isAuthenticated(),
             currentUser: req.user,
+            user: req.user,
+            editable: true,
         })
     } catch (e) {
         next(e)
@@ -44,8 +47,12 @@ exports.tweetDelete = async (req, res, next) => {
     try {
         const tweetId = req.params.tweetId
         await deleteTweet(tweetId)
-        const tweets = await getTweets()
-        res.render('tweets/tweet-list', { tweets })
+        const tweets = await getCurrentUserTweetsWithFollowing(req.user)
+        res.render('tweets/tweet-list', {
+            tweets,
+            currentUser: req.user,
+            editable: true,
+        })
     } catch (e) {
         next(e)
     }
