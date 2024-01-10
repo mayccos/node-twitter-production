@@ -13,13 +13,21 @@ div(class="profile-container bg-white mr-3 d-flex flex-column")
                 a(class="btn btn-outline-primary btn-follow" href="/users/follow/" + user._id) follow
 
     div(class="text-center d-flex flex-row justify-content-center align-items-center my-3")
-        div(class="w-50")
+        div(class="flex-fill mr-2")
             p
                 strong Tweet
                 br
                 span(class="text-primary")= tweets && tweets.filter( t => t.author._id.toString() === user._id.toString()).length
-        div(class="w-50")
+        div(class="flex-fill")
             p
                 strong Following
                 br
                 span(class="text-primary")= user.following.length
+        div(class="flex-fill")
+            p
+                strong Email
+                br
+                if user.local.emailVerified
+                    span(class="text-primary") Verified
+                else 
+                    span(class="text-warning") Not verified

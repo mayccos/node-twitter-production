@@ -7,6 +7,7 @@ const {
     userList,
     followUser,
     unFollowUser,
+    emailLinkVerification,
 } = require('../controllers/users.controller')
 const { ensureAuthenticated } = require('../config/guards.config')
 
@@ -17,5 +18,6 @@ router.get('/:username', userProfile)
 router.get('/signup/form', signupForm)
 router.post('/signup', signup)
 router.post('/update/image', ensureAuthenticated, uploadImage)
+router.get('/email-verification/:userId/:token', emailLinkVerification)
 
 module.exports = router

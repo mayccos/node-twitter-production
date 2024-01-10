@@ -6,6 +6,8 @@ const userSchema = schema({
     username: { type: String, required: true },
     local: {
         email: { type: String, required: true, unique: true },
+        emailVerified: { type: Boolean },
+        emailToken: { type: String },
         password: { type: String, required: true },
     },
     avatar: { type: String, default: '/images/default-profile.svg' },
