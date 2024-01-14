@@ -5,6 +5,7 @@ const {
     addUserIdToCurrentUserFollowing,
     removeUserIdToCurrentUserFollowing,
     findUserPerId,
+    findUserPerEmail,
 } = require('../queries/users.queries')
 const path = require('path')
 const multer = require('multer')
@@ -133,6 +134,99 @@ exports.emailLinkVerification = async (req, res, next) => {
             return res.redirect('/')
         } else {
             return res.status(400).json('Problem during email verification')
+        }
+    } catch (e) {
+        next(e)
+    }
+}
+
+const moment = require('moment')
+const { v4: uuid } = require('uuid')
+const User = require('../database/models/user.model')
+
+exports.initResetPassword = async (req, res, next) => {
+    try {
+        const { email } = req.body
+        if (email) {
+            // Nous récupérons l'utilisateur à l'aide de son email :
+            const user = await findUserPerEmail(email)
+            if (user) {
+                // Nous générons un uuid pour l'utiliser comme token :
+                user.local.passwordToken = uuid()
+                // Nous fixons une date d'expiration pour le token
+                // dans deux heures :
+                user.local.passwordTokenExpiration = moment()
+                    .add(2, 'hours')
+                    .toDate()
+                // Nous sauvegardons l'utilisateur avec le token
+                // et la date d'expiration :
+                await user.save()
+                // Nous allons créer cette méthode d'envoi dans email.js :
+                emailFactory.sendResetPasswordLink({
+                    to: email,
+                    host: req.headers.host,
+                    userId: user._id,
+                    token: user.local.passwordToken,
+                })
+                return res.status(200).end()
+            }
+        }
+        return res.status(400).json('Utilisateur inconnu')
+    } catch (e) {
+        next(e)
+    }
+}
+
+exports.resetPasswordForm = async (req, res, next) => {
+    try {
+        const { userId, token } = req.params
+        // Nous récupérons l'utilisateur avec son id :
+        const user = await findUserPerId(userId)
+        // Nous comparons le token de la requête et celui en bdd :
+        if (user && user.local.passwordToken === token) {
+            // S'ils correspondent nous envoyons le formulaire de réinitialisation :
+            return res.render('auth/auth-reset-password', {
+                url: `https://${req.headers.host}/users/reset-password/${user._id}/${user.local.passwordToken}`,
+                errors: null,
+                isAuthenticated: false,
+            })
+        } else {
+            return res.status(400).json("L'utilisateur n'existe pas")
+        }
+    } catch (e) {
+        next(e)
+    }
+}
+
+exports.resetPassword = async (req, res, next) => {
+    try {
+        // Nous récupérons depuis l'URL les paramètres
+        // userId et token :
+        const { userId, token } = req.params
+        // Nous récupérons le nouveau mot de passe du body :
+        const { password } = req.body
+        // Nous récupérons l'utilisateur avec son id :
+        const user = await findUserPerId(userId)
+        if (
+            password &&
+            user &&
+            // Si les deux tokens correspondent :
+            user.local.passwordToken === token &&
+            // Et si le token n'est pas expiré :
+            moment() < moment(user.local.passwordTokenExpiration)
+        ) {
+            // Alors nous mettons à jour le mot de passe sans oublier de le hasher :
+            user.local.password = await User.hashPassword(password)
+            user.local.passwordToken = null
+            user.local.passwordTokenExpiration = null
+            await user.save()
+            return res.redirect('/')
+        } else {
+            return res.render('auth/auth-reset-password', {
+                url: `https://${req.headers.host}/users/reset-password/${user._id}/${user.local.passwordToken}`,
+                errors: ["Une erreur s'est produite"],
+                isAuthenticated: false,
+            })
         }
     } catch (e) {
         next(e)

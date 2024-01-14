@@ -1,6 +1,7 @@
 extends ../layout
 
 block content
+  script(src="/javascripts/auth/auth-form.js")
   div(class="d-flex flex-row content justify-content-center mx-auto")
     form(class="card w-50 mt-5" method="post" action="/auth/signin")
       div(class="card-header") Connexion
@@ -15,5 +16,7 @@ block content
           ul(class="my-2")
             each error in errors
               li(class="text-danger")= error
-        div(class="w-100")
+        div(class="w-100 forgot-submit")
+                    
+          div(id="forgot" class="text-hint") forgot password ?
           input(type="submit" value="connexion" class="btn btn-primary ms-auto d-block")

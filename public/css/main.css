@@ -84,3 +84,15 @@ body {
     border-radius: 30px;
     font-weight: bold;
 }
+
+.text-hint {
+    color: #718093;
+    font-size: 12px;
+    cursor: pointer;
+}
+.forgot-submit {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between !important;
+    align-items: center;
+}
